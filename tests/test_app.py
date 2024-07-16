@@ -10,7 +10,7 @@ class FlaskTestCase(unittest.TestCase):
         response = self.app.get('/')
         self.assertEqual(response.status_code, 200)
 
-    def test_calculate(self):
+    def test_calculate_success(self):
         response = self.app.post('/calculate', json={
             'numPods': 2,
             'numReplicas': 2,
@@ -23,6 +23,20 @@ class FlaskTestCase(unittest.TestCase):
         })
         self.assertEqual(response.status_code, 200)
         self.assertIn('provider', response.json)
+
+    def test_calculate_failure(self):
+        response = self.app.post('/calculate', json={
+            'numPods': 0,  # Invalid input to simulate failure
+            'numReplicas': 0,
+            'cpuPerPod': 0,
+            'memoryPerPod': 0,
+            'haLevel': 'basic',
+            'storageReq': 0,
+            'networkTraffic': 0,
+            'cloudProvider': 'any'
+        })
+        self.assertEqual(response.status_code, 500)
+        self.assertIn('error', response.json)
 
 if __name__ == '__main__':
     unittest.main()
